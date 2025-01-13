@@ -40,7 +40,7 @@ const loginUser = async (req, res) => {
             const isPasswordMatch = await user.comparePassword(password);
             if (isPasswordMatch) {
                 const token = user.generateToken();
-                res.cookie("token", token, { httpOnly: false, secure: true, sameSite: "none" });
+                res.cookie("token", token, {domain: process.env.DOMAIN_NAME, httpOnly: false, secure: true, sameSite: "none" });
                 res.status(200).json(new ApiResponse(true, "User logged in successfully", { token }));
             }
             else {
