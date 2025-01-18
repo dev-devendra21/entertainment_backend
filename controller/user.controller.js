@@ -40,7 +40,6 @@ const loginUser = async (req, res) => {
             const isPasswordMatch = await user.comparePassword(password);
             if (isPasswordMatch) {
                 const token = user.generateToken();
-                res.cookie("token", token);
                 res.status(200).json(new ApiResponse(true, "User logged in successfully", { token }));
             }
             else {
@@ -55,15 +54,13 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        const token = req.cookies.token || req.headers.authorization.split(" ")[1];
+        const token = req.headers.authorization.split(" ")[1];
         const blacklistToken = await blacklistTokenModel.findOne({ token });
 
         if (blacklistToken) {
-            res.clearCookie("token");
             return res.status(200).json(new ApiResponse(true, "User logged out successfully"));
         }else {
             await blacklistTokenModel.create({ token });
-            res.clearCookie("token");
             res.status(200).json(new ApiResponse(true, "User logged out successfully"));
         }   
     }
