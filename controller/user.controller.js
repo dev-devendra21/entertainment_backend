@@ -1,5 +1,4 @@
 import userModel from "../models/schema/usermodel.js";
-import blacklistTokenModel from "../models/schema/blacklistTokenModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
@@ -52,17 +51,19 @@ const loginUser = async (req, res) => {
     }
 }
 
+const getUserDetails = async (req, res) => {
+    try {
+        const user = req.user;
+        res.status(200).json(new ApiResponse(true, "User details fetched successfully", user));
+    }
+    catch (error) {
+        res.status(500).json(new ApiError(false, error.message));
+    }
+}
+
 const logoutUser = async (req, res) => {
     try {
-        const token = req.headers.authorization.split(" ")[1];
-        const blacklistToken = await blacklistTokenModel.findOne({ token });
-
-        if (blacklistToken) {
-            return res.status(200).json(new ApiResponse(true, "User logged out successfully"));
-        }else {
-            await blacklistTokenModel.create({ token });
-            res.status(200).json(new ApiResponse(true, "User logged out successfully"));
-        }   
+        res.status(200).json(new ApiResponse(true, "User logged out successfully"));  
     }
     catch (error) {
         res.status(500).json(new ApiError(false, error.message));
@@ -70,4 +71,4 @@ const logoutUser = async (req, res) => {
 }
 
 
-export { registerUser, loginUser, logoutUser };
+export { registerUser, loginUser, logoutUser, getUserDetails };
